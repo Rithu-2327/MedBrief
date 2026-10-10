@@ -1,0 +1,212 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MedBrief AI - Medical Report Summary</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 20px 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #020732f3, #07266acf);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+
+    .summary-box {
+      background-color: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(12px);
+      padding: 30px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 900px;
+      max-height: 95vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    h2 {
+      text-align: center;
+      color: #003366;
+      margin: 15px 0 25px;
+    }
+
+    .section {
+      margin-bottom: 22px;
+    }
+
+    .section h3 {
+      font-size: 18px;
+      color: #072d58;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+
+    .highlighted-text {
+      white-space: pre-line;
+      overflow-wrap: anywhere;
+      background-color: #fff;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      color: #111;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .summary-content {
+      background-color: #f6f9ff;
+      padding: 15px;
+      border-radius: 8px;
+      white-space: pre-line;
+      overflow-wrap: anywhere;
+      color: #111;
+      border: 1px solid #cde;
+    }
+
+    /* Medical AI disclaimer */
+    .disclaimer {
+      background: #fff8e6;
+      border: 1px solid #e8c766;
+      border-left: 5px solid #d99a00;
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin: 25px 0 15px;
+      color: #493b16;
+      line-height: 1.6;
+    }
+
+    .disclaimer h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      color: #805900;
+    }
+
+    .disclaimer p {
+      margin: 6px 0;
+      font-size: 14px;
+    }
+
+    .export-btn {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      padding: 12px 22px;
+      font-size: 16px;
+      cursor: pointer;
+      display: block;
+      margin: 25px auto 10px;
+    }
+
+    .export-btn:hover {
+      background-color: #0056b3;
+    }
+
+    .back-arrow {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      cursor: pointer;
+      background-color: white;
+      border-radius: 50%;
+      padding: 10px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .back-arrow:hover {
+      transform: scale(1.1);
+    }
+
+    @media (max-width: 600px) {
+      .summary-box {
+        width: 94%;
+        padding: 22px 16px;
+      }
+
+      h2 {
+        font-size: 21px;
+        margin-top: 45px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="summary-box">
+    <button type="button" class="back-arrow"
+            onclick="goBack()" aria-label="Go back">
+      &#8592;
+    </button>
+
+    <h2>📄 MedBrief AI — Medical Report Summary</h2>
+
+    <div class="section">
+      <h3>📑 Extracted Text (with Medical Terms Highlighted)</h3>
+      <div class="highlighted-text">
+        {{ extracted_text|safe }}
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>📝 AI-Generated Summary</h3>
+      <div class="summary-content">{{ summary }}</div>
+    </div>
+
+    <!-- Medical AI disclaimer -->
+    <div class="disclaimer" role="note" aria-label="Medical AI disclaimer">
+      <h3>⚠️ Important Medical Disclaimer</h3>
+
+      <p>
+        MedBrief AI uses artificial intelligence to summarize medical reports.
+        AI can make mistakes, misinterpret medical terms, or omit important
+        information. Therefore, the generated summary is not guaranteed to be
+        accurate or complete.
+      </p>
+
+      <p>
+        This summary is for informational purposes only. It is not a substitute
+        for professional medical advice, diagnosis, or treatment.
+      </p>
+
+      <p>
+        <strong>
+          Always check the original report and consult a qualified healthcare
+          professional before making medical decisions.
+        </strong>
+      </p>
+    </div>
+
+    <form method="POST" action="{{ url_for('export_pdf') }}">
+      <textarea name="extracted_text" hidden>{{ extracted_text|safe }}</textarea>
+      <textarea name="summary" hidden>{{ summary }}</textarea>
+      <button type="submit" class="export-btn">
+        📥 Export to PDF
+      </button>
+    </form>
+  </div>
+
+  <script>
+    function goBack() {
+      window.history.back();
+    }
+  </script>
+</body>
+</html>

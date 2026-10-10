@@ -1,0 +1,818 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f5f8fc">
+  <title>MedBrief AI | Medical Report Summarizer</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --navy: #172d4f;
+      --blue: #3868e8;
+      --blue-dark: #2854cc;
+      --muted: #718096;
+      --border: #e3eaf3;
+      --bg: #f5f8fc;
+      --green: #168568;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--navy);
+      min-height: 100vh;
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    .navbar {
+      height: 76px;
+      background: rgba(255, 255, 255, 0.95);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 7%;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      color: var(--navy);
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      background: var(--blue);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+      font-weight: 700;
+      box-shadow: 0 5px 14px #3868e833;
+    }
+
+    .brand-name {
+      font-family: 'Manrope', sans-serif;
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: -0.8px;
+    }
+
+    .brand-name span {
+      color: var(--blue);
+    }
+
+    .nav-label {
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .secure-dot {
+      width: 8px;
+      height: 8px;
+      background: #22a783;
+      border-radius: 50%;
+    }
+
+    main {
+      width: min(1100px, 90%);
+      margin: 0 auto;
+      padding: 58px 0 35px;
+    }
+
+    .intro {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 13px;
+      background: #eaf0ff;
+      color: var(--blue);
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .intro h1 {
+      font-family: 'Manrope', sans-serif;
+      font-size: clamp(30px, 4vw, 43px);
+      line-height: 1.2;
+      letter-spacing: -1.7px;
+      margin-bottom: 14px;
+    }
+
+    .intro h1 span {
+      color: var(--blue);
+    }
+
+    .intro p {
+      max-width: 570px;
+      margin: auto;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 1fr 0.72fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 12px 35px #243b5b08;
+    }
+
+    .card-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 23px;
+    }
+
+    .card-heading h2 {
+      font-family: 'Manrope', sans-serif;
+      font-size: 19px;
+      letter-spacing: -0.4px;
+      margin-bottom: 7px;
+    }
+
+    .card-heading p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .step-badge {
+      width: 34px;
+      height: 34px;
+      flex-shrink: 0;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      background: #edf2ff;
+      color: var(--blue);
+      font-weight: 700;
+    }
+
+    .drop-zone {
+      min-height: 245px;
+      border: 1.5px dashed #b8c9e7;
+      background: #f9fbff;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 15px;
+      text-align: center;
+      transition: 0.2s ease;
+    }
+
+    .drop-zone.dragover {
+      background: #edf3ff;
+      border-color: var(--blue);
+      transform: scale(1.01);
+    }
+
+    .upload-art {
+      width: 75px;
+      height: 75px;
+      border-radius: 22px;
+      background: #eaf0ff;
+      display: grid;
+      place-items: center;
+      margin-bottom: 17px;
+    }
+
+    .upload-art img {
+      width: 51px;
+      height: 51px;
+      object-fit: contain;
+    }
+
+    .drop-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 7px;
+    }
+
+    .drop-subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 17px;
+    }
+
+    .browse-btn {
+      display: inline-block;
+      border: 1px solid #d4def5;
+      border-radius: 9px;
+      background: white;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 19px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .browse-btn:hover {
+      background: #edf2ff;
+    }
+
+    .format-note {
+      color: #8794a8;
+      font-size: 11px;
+      margin-top: 15px;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .file-preview {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      margin-top: 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: white;
+    }
+
+    .file-symbol {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: #edf2ff;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .file-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .file-name {
+      font-size: 13px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .file-size {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+
+    .remove-file {
+      border: none;
+      background: transparent;
+      color: #d04f5b;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 7px;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 12px;
+      margin: 15px 0;
+      min-height: 18px;
+    }
+
+    .status.error {
+      color: #c53f4b;
+    }
+
+    .upload-button {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 15px;
+      color: white;
+      background: var(--blue);
+      border: none;
+      border-radius: 11px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 15px #3868e829;
+      transition: 0.2s;
+    }
+
+    .upload-button:hover:not(:disabled) {
+      background: var(--blue-dark);
+      transform: translateY(-1px);
+    }
+
+    .upload-button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .button-loader {
+      display: none;
+      width: 17px;
+      height: 17px;
+      border: 2px solid #ffffff66;
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .privacy-note {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 17px;
+      line-height: 1.6;
+    }
+
+    .features-card {
+      background: linear-gradient(150deg, #172f55, #234b81);
+      border: none;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .features-card::after {
+      content: "";
+      position: absolute;
+      width: 210px;
+      height: 210px;
+      border-radius: 50%;
+      background: #ffffff09;
+      top: -100px;
+      right: -90px;
+    }
+
+    .features-card .card-heading {
+      position: relative;
+      z-index: 1;
+    }
+
+    .features-card .card-heading p {
+      color: #c2d1e8;
+    }
+
+    .features-card .step-badge {
+      background: #ffffff19;
+      color: white;
+    }
+
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 23px;
+      margin-top: 29px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .feature-icon {
+      width: 43px;
+      height: 43px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: #ffffff14;
+      border: 1px solid #ffffff1c;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .feature-item h3 {
+      font-size: 14px;
+      margin: 2px 0 6px;
+    }
+
+    .feature-item p {
+      color: #c2d1e8;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .process-note {
+      margin-top: 30px;
+      padding: 15px;
+      border-radius: 12px;
+      background: #ffffff0d;
+      border: 1px solid #ffffff17;
+      color: #d4e0f0;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .process-note strong {
+      color: white;
+    }
+
+    footer {
+      text-align: center;
+      color: #8a97a9;
+      font-size: 12px;
+      padding: 27px 15px 24px;
+    }
+
+    footer strong {
+      color: var(--navy);
+    }
+
+    @media (max-width: 760px) {
+      .navbar {
+        height: 68px;
+        padding: 0 5%;
+      }
+
+      .nav-label {
+        font-size: 11px;
+      }
+
+      main {
+        width: 92%;
+        padding-top: 38px;
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 23px;
+      }
+
+      .intro {
+        margin-bottom: 27px;
+      }
+
+      .intro h1 {
+        letter-spacing: -1px;
+      }
+
+      .features-card {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .brand-name {
+        font-size: 18px;
+      }
+
+      .brand-icon {
+        width: 37px;
+        height: 37px;
+      }
+
+      .nav-label {
+        gap: 5px;
+        font-size: 10px;
+      }
+
+      .card {
+        padding: 18px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="navbar">
+    <a href="{{ url_for('index') }}" class="brand">
+      <div class="brand-icon">+</div>
+      <div class="brand-name">MedBrief <span>AI</span></div>
+    </a>
+
+    <div class="nav-label">
+      <span class="secure-dot"></span>
+      Medical report assistant
+    </div>
+  </header>
+
+  <main>
+    <section class="intro">
+      <div class="eyebrow">✦ AI-powered document insights</div>
+      <h1>Your medical reports,<br><span>made easier to understand.</span></h1>
+      <p>
+        Upload a medical report and let AI create a concise summary
+        while identifying important medical terms.
+      </p>
+    </section>
+
+    <section class="workspace">
+      <div class="card">
+        <div class="card-heading">
+          <div>
+            <h2>Upload your report</h2>
+            <p>Choose a document to begin your summary.</p>
+          </div>
+          <div class="step-badge">01</div>
+        </div>
+
+        <form id="uploadForm"
+              action="{{ url_for('upload_file') }}"
+              method="post"
+              enctype="multipart/form-data">
+
+          <div class="drop-zone" id="drop-zone">
+            <div class="upload-art">
+              <img id="uploadGif"
+                   src="{{ url_for('static', filename='cloud_upload.gif') }}"
+                   alt=""
+                   onerror="this.style.display='none'">
+            </div>
+
+            <p class="drop-title" id="dropTitle">Drop your file here</p>
+            <p class="drop-subtitle" id="dropSubtitle">
+              Drag and drop or browse from your device
+            </p>
+
+            <label class="browse-btn" for="fileInput">Browse files</label>
+            <input class="file-input"
+                   type="file"
+                   name="file"
+                   id="fileInput"
+                   accept=".pdf,.png,.jpg,.jpeg"
+                   required>
+
+            <p class="format-note">PDF, JPG or PNG · Max size depends on server settings</p>
+          </div>
+
+          <div class="file-preview" id="filePreview">
+            <div class="file-symbol" id="fileSymbol">PDF</div>
+            <div class="file-info">
+              <p class="file-name" id="fileName"></p>
+              <p class="file-size" id="fileSize"></p>
+            </div>
+            <button type="button" class="remove-file" id="removeFile">
+              Remove
+            </button>
+          </div>
+
+          <p class="status" id="statusText" role="status" aria-live="polite">
+            No file selected
+          </p>
+
+          <button type="submit" class="upload-button" id="uploadBtn">
+            <span id="buttonText">↑ &nbsp; Generate summary</span>
+            <span class="button-loader" id="buttonLoader"></span>
+          </button>
+
+          <p class="privacy-note">
+            <span>🔒</span>
+            Upload only documents you are authorized to share.
+          </p>
+        </form>
+      </div>
+
+      <aside class="card features-card">
+        <div class="card-heading">
+          <div>
+            <h2>What MedBrief AI does</h2>
+            <p>From lengthy reports to useful insights.</p>
+          </div>
+          <div class="step-badge">02</div>
+        </div>
+
+        <ul class="feature-list">
+          <li class="feature-item">
+            <div class="feature-icon">📄</div>
+            <div>
+              <h3>Read your report</h3>
+              <p>Extracts text from supported medical documents and images.</p>
+            </div>
+          </li>
+
+          <li class="feature-item">
+            <div class="feature-icon">✦</div>
+            <div>
+              <h3>AI-powered summary</h3>
+              <p>Turns lengthy report text into a shorter, easier-to-read summary.</p>
+            </div>
+          </li>
+
+          <li class="feature-item">
+            <div class="feature-icon">🔎</div>
+            <div>
+              <h3>Highlight medical terms</h3>
+              <p>Identifies relevant medical terminology in the extracted content.</p>
+            </div>
+          </li>
+
+          <li class="feature-item">
+            <div class="feature-icon">↓</div>
+            <div>
+              <h3>View and save results</h3>
+              <p>Review the generated output and use the available download option.</p>
+            </div>
+          </li>
+        </ul>
+
+        <div class="process-note">
+          <strong>How it works</strong><br>
+          Upload report → Extract text → Generate summary → Review results
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer>
+    <strong>MedBrief AI</strong> · AI-assisted medical document summarization
+    <br>
+    For informational support only. Not a substitute for professional medical advice.
+  </footer>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const uploadForm = document.getElementById('uploadForm');
+    const dropZone = document.getElementById('drop-zone');
+    const statusText = document.getElementById('statusText');
+    const filePreview = document.getElementById('filePreview');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const fileSymbol = document.getElementById('fileSymbol');
+    const dropTitle = document.getElementById('dropTitle');
+    const dropSubtitle = document.getElementById('dropSubtitle');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const buttonText = document.getElementById('buttonText');
+    const buttonLoader = document.getElementById('buttonLoader');
+    const removeFile = document.getElementById('removeFile');
+
+    const allowedExtensions = ['pdf', 'jpg', 'jpeg', 'png'];
+    const maxFileSize = 16 * 1024 * 1024; // 16 MB, adjust to match your server
+
+    function showStatus(message, isError = false) {
+      statusText.textContent = message;
+      statusText.classList.toggle('error', isError);
+    }
+
+    function formatSize(bytes) {
+      if (bytes < 1024) return bytes + ' bytes';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    function selectFile(file) {
+      if (!file) return;
+
+      const extension = file.name.split('.').pop().toLowerCase();
+
+      if (!allowedExtensions.includes(extension)) {
+        fileInput.value = '';
+        filePreview.style.display = 'none';
+        showStatus('Unsupported file type. Choose a PDF, JPG or PNG.', true);
+        return;
+      }
+
+      if (file.size > maxFileSize) {
+        fileInput.value = '';
+        filePreview.style.display = 'none';
+        showStatus('File is larger than 16 MB. Please choose a smaller file.', true);
+        return;
+      }
+
+      // Use DataTransfer to keep the dropped file attached to the form.
+      if (fileInput.files[0] !== file) {
+        try {
+          const transfer = new DataTransfer();
+          transfer.items.add(file);
+          fileInput.files = transfer.files;
+        } catch (error) {
+          // The file input already contains the selected file in normal browsing.
+        }
+      }
+
+      fileName.textContent = file.name;
+      fileSize.textContent = formatSize(file.size);
+      fileSymbol.textContent = extension.toUpperCase() === 'JPEG'
+        ? 'JPG'
+        : extension.toUpperCase();
+
+      filePreview.style.display = 'flex';
+      dropTitle.textContent = 'File ready to upload';
+      dropSubtitle.textContent = 'Your selected document is ready';
+      showStatus('Document selected successfully.');
+    }
+
+    fileInput.addEventListener('change', () => {
+      selectFile(fileInput.files[0]);
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, event => {
+        event.preventDefault();
+        dropZone.classList.add('dragover');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, event => {
+        event.preventDefault();
+        dropZone.classList.remove('dragover');
+      });
+    });
+
+    dropZone.addEventListener('drop', event => {
+      const file = event.dataTransfer.files[0];
+      if (file) selectFile(file);
+    });
+
+    removeFile.addEventListener('click', () => {
+      fileInput.value = '';
+      filePreview.style.display = 'none';
+      dropTitle.textContent = 'Drop your file here';
+      dropSubtitle.textContent = 'Drag and drop or browse from your device';
+      showStatus('No file selected');
+    });
+
+    uploadForm.addEventListener('submit', event => {
+      if (!fileInput.files.length) {
+        event.preventDefault();
+        showStatus('Please select a document before continuing.', true);
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const extension = file.name.split('.').pop().toLowerCase();
+
+      if (!allowedExtensions.includes(extension) || file.size > maxFileSize) {
+        event.preventDefault();
+        showStatus('Please select a supported file within the size limit.', true);
+        return;
+      }
+
+      uploadBtn.disabled = true;
+      buttonText.textContent = 'Processing your report...';
+      buttonLoader.style.display = 'inline-block';
+      dropTitle.textContent = 'Your report is being processed';
+      dropSubtitle.textContent = 'Extracting text and generating your summary';
+      showStatus('Please wait. This may take a little while.');
+    });
+  </script>
+</body>
+</html>
